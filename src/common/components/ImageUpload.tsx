@@ -1,7 +1,7 @@
 import React, { useRef } from "react"
 
 export default function ImageUpload(props: {
-  src: string
+  image: string
   onChange: (image: string) => void
 }) {
   const fileInput = useRef<HTMLInputElement>(null)
@@ -25,7 +25,7 @@ export default function ImageUpload(props: {
 
   return (
     <div>
-      <img src={props.src} alt="" height="100" onClick={imageClick} />
+      <img src={props.image} alt="" height="100" onClick={imageClick} />
       <input
         type="file"
         ref={fileInput}

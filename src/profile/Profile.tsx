@@ -15,8 +15,7 @@ import { getProvinces, Province } from "../provinces/provincesService"
 import "../styles.css"
 import {
   getCurrentProfile,
-  updateBasicInfo,
-  updateProfilePicture
+  updateProfile,
 } from "./profileService"
 
 export default function Profile() {
@@ -26,7 +25,7 @@ export default function Profile() {
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [picture, setPicture] = useState("")
-  const [province, setProvince] = useState("")
+  const [provinceId, setProvinceId] = useState("")
   const [provinces, setProvinces] = useState<Province[]>([])
 
   const errorHandler = useErrorHandler()
@@ -49,18 +48,7 @@ export default function Profile() {
       setName(result.name)
       setPhone(result.phone)
       setPicture(result.picture)
-      setProvince(result.province)
-    } catch (error) {
-      errorHandler.processRestValidations(error)
-    }
-  }
-
-  const uploadPicture = async (image: string) => {
-    try {
-      const result = await updateProfilePicture({
-        image,
-      })
-      setPicture(result.id)
+      setProvinceId(result.provinceId)
     } catch (error) {
       errorHandler.processRestValidations(error)
     }
@@ -79,12 +67,13 @@ export default function Profile() {
     }
 
     try {
-      await updateBasicInfo({
+      await updateProfile({
         address,
         email,
         name,
         phone,
-        province,
+        provinceId,
+        picture
       })
       history("/")
     } catch (error) {
@@ -114,7 +103,7 @@ export default function Profile() {
           picture={picture}
           name="image"
           errorHandler={errorHandler}
-          onImageChanged={uploadPicture}
+          onImageChanged={setPicture}
         />
 
         <FormInput
@@ -128,8 +117,8 @@ export default function Profile() {
         <div className="form-group">
           <label>Provincia</label>
           <select
-            value={province}
-            onChange={(e) => setProvince(e.target.value)}
+            value={provinceId}
+            onChange={(e) => setProvinceId(e.target.value)}
             className={errorHandler.getErrorClass("email", "form-control")}
           >
             {provinces.map((p) => (

@@ -15,7 +15,7 @@ export async function login(params: {
   password: string
 }): Promise<Token> {
   const res = (
-    await axios.post(environment.backendUrl + "/users/login", params)
+    await axios.post(environment.backendUrl + "/user/login", params)
   ).data as Token
 
   setCurrentToken(res.token)
@@ -81,7 +81,7 @@ export async function newUser(params: {
   userName: string
   password: string
 }): Promise<Token> {
-  const res = (await axios.post(environment.backendUrl + "/users/register", params))
+  const res = (await axios.post(environment.backendUrl + "/user/register", params))
     .data as Token
   setCurrentToken(res.token)
   updateSessionToken(res.token)
@@ -94,7 +94,7 @@ export async function changePassword(params: {
   newPassword: string
 }): Promise<void> {
   try {
-    await axios.post(environment.backendUrl + "/user/password", params)
+    await axios.post(environment.backendUrl + "/user/changePassword", params)
     return
   } catch (err) {
     const axiosError = err as AxiosError
@@ -111,7 +111,7 @@ if (getCurrentToken()) {
   const currentToken = getCurrentToken()
   if (currentUser !== undefined && currentToken !== undefined) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    axios.defaults.headers.common.Authorization = "bearer " + currentToken
+    axios.defaults.headers.common.Authorization = "Bearer " + currentToken
     updateSessionToken(currentToken)
     updateSessionUser(currentUser)
     void reloadCurrentUser().then()

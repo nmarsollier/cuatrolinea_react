@@ -7,20 +7,21 @@ interface Profile {
   phone: string
   email: string
   address: string
-  province: string
+  provinceId: string
   picture: string
 }
 
-export async function updateBasicInfo(params: {
+export async function updateProfile(params: {
   name: string
   phone: string
   email: string
   address: string
-  province: string
+  provinceId: string
+  picture: string
 }): Promise<Profile> {
   try {
     const res = (
-      await axios.post(environment.backendUrl + "/profile", params)
+      await axios.post(environment.backendUrl + "/profile/update", params)
     ).data as Profile
     return res
   } catch (err) {
@@ -35,17 +36,9 @@ interface UpdateProfileImageId {
   id: string
 }
 
-export async function updateProfilePicture(params: {
-  image: string
-}): Promise<UpdateProfileImageId> {
-  return (
-    await axios.post(environment.backendUrl + "/profile/picture", params)
-  ).data as UpdateProfileImageId
-}
-
 export async function getCurrentProfile(): Promise<Profile> {
   try {
-    return (await axios.get(environment.backendUrl + "/profile"))
+    return (await axios.get(environment.backendUrl + "/profile/current"))
       .data as Profile
   } catch (err) {
     const axiosError = err as AxiosError
@@ -53,13 +46,5 @@ export async function getCurrentProfile(): Promise<Profile> {
       void logout()
     }
     throw err
-  }
-}
-
-export function getPictureUrl(id: string) {
-  if (id && id.length > 0) {
-    return environment.backendUrl + "/image/" + id
-  } else {
-    return "/assets/profile.png"
   }
 }

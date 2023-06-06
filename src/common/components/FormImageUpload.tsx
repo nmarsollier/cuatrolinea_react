@@ -1,5 +1,4 @@
 import React from "react"
-import { getPictureUrl } from "../../profile/profileService"
 import { ErrorHandler } from "../utils/ErrorHandler"
 import ErrorLabel from "./ErrorLabel"
 import ImageUpload from "./ImageUpload"
@@ -14,10 +13,18 @@ export default function FromImageUpload(props: {
     <div className="form-group">
       <label>Profile Picture</label>
       <ImageUpload
-        src={getPictureUrl(props.picture)}
+        image={getPictureData(props.picture)}
         onChange={props.onImageChanged}
       />
       <ErrorLabel message={props.errorHandler.getErrorText("image")} />
     </div>
   )
+}
+
+function getPictureData(data: string) {
+  if (data && data.length > 0) {
+    return data
+  } else {
+    return "/assets/profile.png"
+  }
 }
