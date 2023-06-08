@@ -8,33 +8,37 @@ import FormButtonBar from "../common/components/FormButtonBar"
 import FormPassword from "../common/components/FormPassword"
 import FormTitle from "../common/components/FormTitle"
 import GlobalContent from "../common/components/GlobalContent"
-import { useErrorHandler } from "../common/utils/ErrorHandler"
 import "../styles.css"
 import { changePassword } from "./userService"
 
+interface ScreenErrors {
+    currentPassword?: string | undefined,
+    newPassword?: string | undefined,
+    newPassword2?: string | undefined,
+    generic?: string | undefined,
+}
 
 export default function Password() {
     const history = useNavigate()
     const [currentPassword, setCurrentPassword] = useState("")
     const [newPassword, setNewPassword] = useState("")
     const [newPassword2, setNewPassword2] = useState("")
-
-    const errorHandler = useErrorHandler()
+    const [errors, setErrors] = useState<ScreenErrors>({})
 
     const updatePasswordClick = async () => {
-        errorHandler.cleanRestValidations()
+        const err: ScreenErrors = {}
 
         if (!currentPassword) {
-            errorHandler.addError("currentPassword", "No puede estar vacío")
+            errors.currentPassword = "No puede estar vacío"
         }
         if (!newPassword) {
-            errorHandler.addError("newPassword", "No puede estar vacío")
+            errors.newPassword = "No puede estar vacío"
         }
         if (newPassword !== newPassword2) {
-            errorHandler.addError("newPassword2", "Las contraseñas no coinciden")
+            errors.newPassword2 = "Las contraseñas no coinciden"
         }
-
-        if (errorHandler.hasErrors()) {
+        setErrors(err)
+        if (hasErrors()) {
             return
         }
 
@@ -45,8 +49,15 @@ export default function Password() {
             })
             history("/")
         } catch (error) {
-            errorHandler.processRestValidations(error)
+            setErrors({ generic: "Error inesperado" })
         }
+    }
+
+    function hasErrors(): boolean {
+        if (errors.currentPassword || errors.newPassword || errors.newPassword2 || errors.generic)
+            return true
+        else
+            return false
     }
 
     return (
@@ -57,22 +68,22 @@ export default function Password() {
                 <FormPassword
                     label="Password Actual"
                     name="currentPassword"
-                    errorHandler={errorHandler}
+                    errorText={errors.currentPassword}
                     onChange={event => setCurrentPassword(event.target.value)} />
 
                 <FormPassword
                     label="Nuevo Password"
                     name="newPassword"
-                    errorHandler={errorHandler}
+                    errorText={errors.newPassword}
                     onChange={event => setNewPassword(event.target.value)} />
 
                 <FormPassword
                     label="Repetir Password"
                     name="newPassword2"
-                    errorHandler={errorHandler}
+                    errorText={errors.newPassword2}
                     onChange={event => setNewPassword2(event.target.value)} />
 
-                <DangerLabel message={errorHandler.errorMessage} />
+                <DangerLabel message={errors.generic} />
 
                 <FormButtonBar>
                     <FormAcceptButton label="Cambiar" onClick={updatePasswordClick} />

@@ -1,11 +1,11 @@
 import React from "react"
-import { ErrorHandler } from "../utils/ErrorHandler"
+import * as ErrorClass from "./ErrorClass"
 import ErrorLabel from "./ErrorLabel"
 
 export default function FormPassword(props: {
   label: string
   name: string
-  errorHandler: ErrorHandler
+  errorText: string | undefined
   value?: string | undefined
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => any
 }) {
@@ -17,9 +17,9 @@ export default function FormPassword(props: {
         type="password"
         value={props.value}
         onChange={props.onChange}
-        className={props.errorHandler.getErrorClass(props.name, "form-control")}
+        className={ErrorClass.getErrorClass(props.errorText, "form-control")}
       ></input>
-      <ErrorLabel message={props.errorHandler.getErrorText(props.name)} />
+      <ErrorLabel message={props.errorText} />
     </div>
   )
 }

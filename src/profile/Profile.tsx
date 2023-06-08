@@ -10,16 +10,27 @@ import FormImageUpload from "../common/components/FormImageUpload"
 import FormInput from "../common/components/FormInput"
 import FormTitle from "../common/components/FormTitle"
 import GlobalContent from "../common/components/GlobalContent"
-import { useErrorHandler } from "../common/utils/ErrorHandler"
 import { getProvinces, Province } from "../provinces/provincesService"
 import "../styles.css"
 import {
   getCurrentProfile,
   updateProfile,
 } from "./profileService"
+import { getErrorClass } from "../common/components/ErrorClass"
+
+interface ScreenErrors {
+  address?: string | undefined,
+  email?: string | undefined,
+  name?: string | undefined,
+  phone?: string | undefined,
+  provinceId?: string | undefined,
+  picture?: string | undefined,
+  generic?: string | undefined,
+}
 
 export default function Profile() {
   const history = useNavigate()
+  const [errors, setErrors] = useState<ScreenErrors>({})
   const [address, setAddress] = useState("")
   const [email, setEmail] = useState("")
   const [name, setName] = useState("")
@@ -28,14 +39,12 @@ export default function Profile() {
   const [provinceId, setProvinceId] = useState("")
   const [provinces, setProvinces] = useState<Province[]>([])
 
-  const errorHandler = useErrorHandler()
-
   const loadProvinces = async () => {
     try {
       const result = await getProvinces()
       setProvinces(result)
     } catch (error) {
-      errorHandler.processRestValidations(error)
+      setErrors({ generic: "Error inesperado" })
     }
   }
 
@@ -50,19 +59,20 @@ export default function Profile() {
       setPicture(result.picture)
       setProvinceId(result.provinceId)
     } catch (error) {
-      errorHandler.processRestValidations(error)
+      setErrors({ generic: "Error inesperado" })
     }
   }
 
   const updateClick = async () => {
-    errorHandler.cleanRestValidations()
+    const err: ScreenErrors = {}
     if (!name) {
-      errorHandler.addError("name", "No puede estar vacío")
+      err.name = "No puede esta vacío"
     }
     if (!email) {
-      errorHandler.addError("email", "No puede estar vacío")
+      err.email = "No puede esta vacío"
     }
-    if (errorHandler.hasErrors()) {
+    setErrors(err)
+    if (hasErrors()) {
       return
     }
 
@@ -77,7 +87,7 @@ export default function Profile() {
       })
       history("/")
     } catch (error) {
-      errorHandler.processRestValidations(error)
+      setErrors({ generic: "Error inesperado" })
     }
   }
 
@@ -85,6 +95,13 @@ export default function Profile() {
     void loadProvinces()
     void loadProfile()
   }, [])
+
+  function hasErrors(): boolean {
+    if (errors.address || errors.email || errors.name || errors.phone || errors.provinceId || errors.picture || errors.generic)
+      return true
+    else
+      return false
+  }
 
   return (
     <GlobalContent>
@@ -96,13 +113,13 @@ export default function Profile() {
           name="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          errorHandler={errorHandler}
+          errorText={errors.name}
         />
 
         <FormImageUpload
           picture={picture}
           name="image"
-          errorHandler={errorHandler}
+          errorText={errors.picture}
           onImageChanged={setPicture}
         />
 
@@ -111,7 +128,7 @@ export default function Profile() {
           name="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          errorHandler={errorHandler}
+          errorText={errors.email}
         />
 
         <div className="form-group">
@@ -119,7 +136,7 @@ export default function Profile() {
           <select
             value={provinceId}
             onChange={(e) => setProvinceId(e.target.value)}
-            className={errorHandler.getErrorClass("email", "form-control")}
+            className={getErrorClass(errors.provinceId, "form-control")}
           >
             {provinces.map((p) => (
               <option key={p.id} value={p.id}>
@@ -127,7 +144,7 @@ export default function Profile() {
               </option>
             ))}
           </select>
-          <ErrorLabel message={errorHandler.getErrorText("province")} />
+          <ErrorLabel message={errors.provinceId} />
         </div>
 
         <FormInput
@@ -135,7 +152,7 @@ export default function Profile() {
           name="address"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
-          errorHandler={errorHandler}
+          errorText={errors.address}
         />
 
         <FormInput
@@ -143,10 +160,10 @@ export default function Profile() {
           name="phone"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          errorHandler={errorHandler}
+          errorText={errors.phone}
         />
 
-        <DangerLabel message={errorHandler.errorMessage} />
+        <DangerLabel message={errors.generic} />
 
         <FormButtonBar>
           <FormAcceptButton label="Actualizar" onClick={updateClick} />

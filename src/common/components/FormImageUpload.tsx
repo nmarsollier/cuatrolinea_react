@@ -1,12 +1,11 @@
 import React from "react"
-import { ErrorHandler } from "../utils/ErrorHandler"
 import ErrorLabel from "./ErrorLabel"
 import ImageUpload from "./ImageUpload"
 
 export default function FromImageUpload(props: {
   picture: string
   name: string
-  errorHandler: ErrorHandler
+  errorText: string | undefined
   onImageChanged: (image: string) => any
 }) {
   return (
@@ -16,7 +15,7 @@ export default function FromImageUpload(props: {
         image={getPictureData(props.picture)}
         onChange={props.onImageChanged}
       />
-      <ErrorLabel message={props.errorHandler.getErrorText("image")} />
+      <ErrorLabel message={props.errorText} />
     </div>
   )
 }

@@ -58,6 +58,7 @@ export async function logout(): Promise<void> {
 }
 
 export interface User {
+  login: string,
   name: string
 }
 

@@ -9,26 +9,32 @@ import FormInput from "../common/components/FormInput"
 import FormPassword from "../common/components/FormPassword"
 import FormTitle from "../common/components/FormTitle"
 import GlobalContent from "../common/components/GlobalContent"
-import { useErrorHandler } from "../common/utils/ErrorHandler"
 import "../styles.css"
 import { login } from "./userService"
+
+interface ScreenErrors {
+    userName?: string | undefined,
+    password?: string | undefined,
+    generic?: string | undefined,
+}
 
 export default function Login() {
     const history = useNavigate()
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
-
-    const errorHandler = useErrorHandler()
+    const [errors, setErrors] = useState<ScreenErrors>({})
 
     const loginClick = async () => {
-        errorHandler.cleanRestValidations()
+        const err: ScreenErrors = {}
+
         if (!userName) {
-            errorHandler.addError("userName", "No puede estar vacío")
+            err.userName = "No puede estar vacío"
         }
         if (!password) {
-            errorHandler.addError("password", "No puede estar vacío")
+            err.password = "No puede estar vacío"
         }
-        if (errorHandler.hasErrors()) {
+        setErrors(err)
+        if (hasErrors()) {
             return
         }
 
@@ -39,8 +45,15 @@ export default function Login() {
             })
             history('/')
         } catch (error) {
-            errorHandler.processRestValidations(error)
+            setErrors({ generic: "Error inesperado" })
         }
+    }
+
+    function hasErrors(): boolean {
+        if (errors.password || errors.userName || errors.generic)
+            return true
+        else
+            return false
     }
 
     return (
@@ -51,16 +64,16 @@ export default function Login() {
                 <FormInput
                     label="Usuario"
                     name="userName"
-                    errorHandler={errorHandler}
+                    errorText={errors.userName}
                     onChange={(event) => setUserName(event.target.value)} />
 
                 <FormPassword
                     label="Password"
                     name="password"
-                    errorHandler={errorHandler}
+                    errorText={errors.password}
                     onChange={(event) => setPassword(event.target.value)} />
 
-                <DangerLabel message={errorHandler.errorMessage} />
+                <DangerLabel message={errors.generic} />
 
                 <FormButtonBar>
                     <FormAcceptButton label="Login" onClick={loginClick} />

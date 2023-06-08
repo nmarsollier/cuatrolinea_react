@@ -16,6 +16,9 @@ export default function MainMenu() {
 
       <h6 className="menu_section">Perfil</h6>
       <NavLink to="/profile" className="menu_item btn btn-sm btn-link">Editar</NavLink><br />
+
+      <h6 className="menu_section">Juego</h6>
+      <NavLink to="/game" className="menu_item btn btn-sm btn-link">Jugar</NavLink><br />
     </div>
   )
 }

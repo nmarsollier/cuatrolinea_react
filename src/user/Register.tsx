@@ -9,44 +9,55 @@ import FormInput from "../common/components/FormInput"
 import FormPassword from "../common/components/FormPassword"
 import FormTitle from "../common/components/FormTitle"
 import GlobalContent from "../common/components/GlobalContent"
-import { useErrorHandler } from "../common/utils/ErrorHandler"
 import "../styles.css"
 import { newUser } from "./userService"
 
+interface ScreenErrors {
+  name?: string | undefined,
+  password?: string | undefined,
+  password2?: string | undefined,
+  generic?: string | undefined,
+}
+
 export default function Register() {
   const history = useNavigate()
-  const [login, setLogin] = useState("")
   const [name, setName] = useState("")
   const [password, setPassword] = useState("")
   const [password2, setPassword2] = useState("")
-
-  const errorHandler = useErrorHandler()
+  const [errors, setErrors] = useState<ScreenErrors>({})
 
   const registerClick = async () => {
-    errorHandler.cleanRestValidations()
+    const err: ScreenErrors = {}
     if (!name) {
-      errorHandler.addError("name", "No puede estar vacío")
+      err.name = "No puede estar vacío"
     }
     if (!password) {
-      errorHandler.addError("password", "No puede estar vacío")
+      err.password = "No puede estar vacío"
     }
     if (password !== password2) {
-      errorHandler.addError("password2", "Las contraseñas no coinciden")
+      err.password2 = "Las contraseñas no coinciden"
     }
-
-    if (errorHandler.hasErrors()) {
+    setErrors(err)
+    if (hasErrors()) {
       return
     }
 
     try {
       await newUser({
-        userName : name,
+        userName: name,
         password,
       })
       history("/")
     } catch (error) {
-      errorHandler.processRestValidations(error)
+      setErrors({ generic: "Error inesperado" })
     }
+  }
+
+  function hasErrors(): boolean {
+    if (errors.name || errors.password || errors.password2 || errors.generic)
+      return true
+    else
+      return false
   }
 
   return (
@@ -58,7 +69,7 @@ export default function Register() {
           label="Usuario"
           name="name"
           value={name}
-          errorHandler={errorHandler}
+          errorText={errors.name}
           onChange={(e) => setName(e.target.value)}
         />
 
@@ -66,7 +77,7 @@ export default function Register() {
           label="Password"
           name="password"
           value={password}
-          errorHandler={errorHandler}
+          errorText={errors.password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
@@ -74,11 +85,11 @@ export default function Register() {
           label="Repetir Password"
           name="password2"
           value={password2}
-          errorHandler={errorHandler}
+          errorText={errors.password2}
           onChange={(e) => setPassword2(e.target.value)}
         />
 
-        <DangerLabel message={errorHandler.errorMessage} />
+        <DangerLabel message={errors.generic} />
 
         <FormButtonBar>
           <FormAcceptButton label="Registrarse" onClick={registerClick} />
