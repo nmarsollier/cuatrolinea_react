@@ -10,6 +10,11 @@ export interface Token {
   token: string
 }
 
+export interface User {
+  login: string,
+  name: string
+}
+
 export async function login(params: {
   userName: string
   password: string
@@ -37,7 +42,7 @@ function setCurrentToken(token: string) {
 }
 
 function getCurrentUser(): User | undefined {
-  return localStorage.getItem("user") as unknown as User
+  return localStorage.getItem("user") as any as User
 }
 
 export async function logout(): Promise<void> {
@@ -57,12 +62,7 @@ export async function logout(): Promise<void> {
   }
 }
 
-export interface User {
-  login: string,
-  name: string
-}
-
-export async function reloadCurrentUser(): Promise<User> {
+export async function reloadCurrentUser(): Promise<User | undefined> {
   try {
     const res = (await axios.get(environment.backendUrl + "/profile/current"))
       .data as User
@@ -74,7 +74,6 @@ export async function reloadCurrentUser(): Promise<User> {
     if (axiosError.response && axiosError.response.status === 401) {
       void logout()
     }
-    throw err
   }
 }
 

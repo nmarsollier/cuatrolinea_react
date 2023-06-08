@@ -52,6 +52,7 @@ export default function Profile() {
     try {
       const result = await getCurrentProfile()
 
+      if(!result) return
       setAddress(result.address)
       setEmail(result.email)
       setName(result.name)

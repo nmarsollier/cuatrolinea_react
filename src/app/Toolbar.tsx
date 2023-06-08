@@ -13,7 +13,7 @@ export default function Toolbar() {
       </div>
 
       <div className="toolbar_title navbar-brand flex-grow-1">
-        Card Game {user ? " - " + user.name : ""}
+        Cuatro en Linea {user ? " - " + user.name : ""}
       </div>
 
       <div className="btn-group navbar-nav">

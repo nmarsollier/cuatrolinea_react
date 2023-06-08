@@ -32,11 +32,7 @@ export async function updateProfile(params: {
   }
 }
 
-interface UpdateProfileImageId {
-  id: string
-}
-
-export async function getCurrentProfile(): Promise<Profile> {
+export async function getCurrentProfile(): Promise<Profile | undefined> {
   try {
     return (await axios.get(environment.backendUrl + "/profile/current"))
       .data as Profile
@@ -45,6 +41,5 @@ export async function getCurrentProfile(): Promise<Profile> {
     if (axiosError.response && axiosError.response.status === 401) {
       void logout()
     }
-    throw err
   }
 }

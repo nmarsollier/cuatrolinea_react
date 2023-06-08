@@ -1,6 +1,6 @@
 # cuatro_linea_react
 
-UI en react para el [proyecto card game](https://github.com/nmarsollier/cuatro_linea_node)
+UI en react para el [proyecto cuatro en linea](https://github.com/nmarsollier/cuatro_linea_node)
 
 Abrir ventana de comandos en la carpeta, ejecutar:
 
