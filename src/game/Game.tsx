@@ -1,4 +1,4 @@
-import { default as React, useState } from "react"
+import { default as React, useEffect, useState } from "react"
 import { NavigateFunction, useNavigate } from "react-router-dom"
 import DangerLabel from "../common/components/DangerLabel"
 import Form from "../common/components/Form"
@@ -17,10 +17,11 @@ interface ScreenErrors {
 
 export default function StateInfo() {
     const history = useNavigate()
-    const [interv, setInterv] = useState<any>(undefined)
     const [errors, setErrors] = useState<ScreenErrors>({})
     const [board, setBoard] = useState<Board | undefined>(undefined)
     const user = useSessionUser()
+
+    let interv: any
 
     async function playNewGame() {
         try {
@@ -28,7 +29,6 @@ export default function StateInfo() {
             setErrors({})
             const result = await newGame()
             setBoard(result)
-            startWaiting(result)
         } catch (error) {
             setErrors({ generic: "Error inesperado" })
         }
@@ -37,7 +37,7 @@ export default function StateInfo() {
     async function playMove(column: number) {
         try {
             setErrors({})
-            if (!canPlay(board)) return
+            if (!canPlay()) return
 
             const result = await play(board!.id, column)
             setBoard(result)
@@ -45,7 +45,8 @@ export default function StateInfo() {
             setErrors({ generic: "Error inesperado" })
         }
     }
-    function canPlay(actualBoard: Board | undefined): boolean {
+
+    function canPlay(): boolean {
         if (!board) return false
         if (!board.id) return false
         if (board.winner) return false
@@ -55,37 +56,45 @@ export default function StateInfo() {
         return true
     }
 
-    async function waitPlayer(actualBoard: Board | undefined) {
+    async function waitPlayer() {
         try {
-            if (!canWait(actualBoard)) return
+            if (!canWait()) return
 
-            const result = await getBoard(actualBoard!.id)
+            const result = await getBoard(board!.id)
             setBoard(result)
         } catch (error) {
             // NOOP
         }
     }
 
-    function canWait(actualBoard: Board | undefined): boolean {
-        if (!actualBoard) return false
-        if (!actualBoard.id) return false
-        if (actualBoard.winner) return false
-        if (actualBoard.match) return false
+    function canWait(): boolean {
+        if (!board) return false
+        if (!board.id) return false
+        if (board.winner) return false
+        if (board.match) return false
         return true
     }
 
-    function startWaiting(waitBoard: Board | undefined) {
+    useEffect(() => {
+        startWaiting()
+
+        return () => {
+            clearIntervals()
+        }
+    }, [board])
+
+    function startWaiting() {
         clearIntervals()
         const tmp = setInterval(
-            () => void waitPlayer(waitBoard),
+            () =>  void waitPlayer(),
             1000
         )
-        setInterv(tmp)
+        interv = tmp
     }
 
     function clearIntervals() {
         clearInterval(interv)
-        setInterv(undefined)
+        interv = undefined
     }
 
     return (
