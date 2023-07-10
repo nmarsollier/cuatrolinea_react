@@ -1,6 +1,5 @@
 import { Subject } from "rxjs"
 import { useState, useLayoutEffect } from "react"
-import { Token } from "../user/userService"
 
 let currentToken: string | undefined
 
